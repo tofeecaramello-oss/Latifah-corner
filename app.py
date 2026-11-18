@@ -9,189 +9,158 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed",
 )
-# الرقم السري الخاص بكِ (تقدرين تغيرينه لأي رقم تبينه بين علامتي التنصيص)
-ADMIN_PASSWORD = "1234"
 
 # تهيئة حالة الخطوات والبيانات
 if "step" not in st.session_state:
-    st.session_state.step = 1
+  st.session_state.step = 1
 if "customer_name" not in st.session_state:
-    st.session_state.customer_name = ""
-if "custom_notes" not in st.session_state:
-    st.session_state.custom_notes = ""
+  st.session_state.customer_name = ""
+if "customer_notes" not in st.session_state:
+  st.session_state.customer_notes = ""
 if "last_order_summary" not in st.session_state:
-    st.session_state.last_order_summary = None
+  st.session_state.last_order_summary = None
 
 FILE_PATH = "orders.csv"
 
-# ==================== القائمة الجانبية السرية (لكِ فقط) ====================
+# ================= القائمة الجانبية السرية (لأصحاب المتجر فقط) =================
 with st.sidebar:
-    st.header("🔒 إدارة لمسة لطيفة")
-    password_input = st.text_input(
-        "أدخلي الرمز السري لعرض الطلبات:", type="password"
-    )
+  st.header("🔐 لوحة تحكم الإدارة")
+  admin_pass = st.text_input("أدخل الرقم السري:", type="password")
 
-    if password_input == ADMIN_PASSWORD:
-        st.success("تم الدخول بنجاح 🤍")
-        st.subheader("الطلبات المسجلة")
+  if admin_pass == "1234":
+    st.success("تم تسجيل الدخول بنجاح!")
+    if os.path.exists(FILE_PATH):
+      df = pd.read_csv(FILE_PATH)
+      st.subheader("📋 الطلبات الواردة:")
+      st.dataframe(df)
 
-        if st.button("تحديث الجدول"):
-            st.rerun()
+      if not df.empty:
+        if st.button("حذف جميع الطلبات"):
+          os.remove(FILE_PATH)
+          st.rerun()
+    else:
+      st.info("لا توجد طلبات مسجلة حتى الآن.")
+  elif admin_pass:
+    st.error("الرقم السري خاطئ.")
 
-        if os.path.exists(FILE_PATH):
-            df_orders = pd.read_csv(FILE_PATH)
-            if not df_orders.empty:
-                st.dataframe(df_orders, use_container_width=True)
-
-                csv_data = df_orders.to_csv(
-                    index=False, encoding="utf-8-sig"
-                ).encode("utf-8-sig")
-                st.download_button(
-                    label="تحميل جدول الطلبات (CSV)",
-                    data=csv_data,
-                    file_name="orders.csv",
-                    mime="text/csv",
-                )
-            else:
-                st.info("لا توجد طلبات مسجلة حتى الآن.")
-        else:
-            st.info("لا توجد طلبات مسجلة حتى الآن.")
-    elif password_input != "":
-        st.error("الرمز السري غير صحيح.")
-
-# ==================== الواجهة الرئيسية للعملاء ====================
+# ================= واجهة العميل الأساسية =================
 st.markdown(
-    "<h1 style='text-align: center; color: #385e42;'>لمسة لطيفة</h1>",
+    "<h1 style='text-align: center;'>لمسة لطيفة 🏃‍♀️💨</h1>",
     unsafe_allow_html=True,
 )
 st.markdown(
-    "<p style='text-align: center; color: #666666;'>شيء نظيف ومضبوط"
-    " بالبيت، يغنيك عن برا.</p>",
+    "<p style='text-align: center; color: gray;'>شيء نظيف ومضبوط بالبيت،"
+    " يغنيك عن برا ✨</p>",
     unsafe_allow_html=True,
 )
 st.write("---")
 
-# --- الخطوة 1: الاسم فقط ---
+# الخطوة الأولى: بيانات العميل
 if st.session_state.step == 1:
-    st.subheader("الخطوة 1 من 2: بيانات العميل")
+  st.subheader("الخطوة 1 من 2: بيانات العميل 🥹")
+  name = st.text_input("اسمك ويا خدمتك:", value=st.session_state.customer_name)
+  notes = st.text_area(
+      "ملاحظات إضافية (اختياري):", value=st.session_state.customer_notes
+  )
 
-    name_input = st.text_input(
-        "🫡اسمك وبالخدمة  :",
-        value=st.session_state.customer_name,
-        placeholder="اكتب اسمك هنا",
-    )
+  if st.button("التالي: اختيار المنتجات والكميات ⬅️"):
+    if name.strip() == "":
+      st.warning("الرجاء إدخال الاسم قبل المتابعة.")
+    else:
+      st.session_state.customer_name = name
+      st.session_state.customer_notes = notes
+      st.session_state.step = 2
+      st.rerun()
 
-    if st.button("التالي: اختيار التاريخ والطلب ←"):
-        if name_input.strip() == "":
-            st.warning("فضلاً، اكتب اسمك أولاً.")
-        else:
-            st.session_state.customer_name = name_input.strip()
-            st.session_state.step = 2
-            st.rerun()
-
-# --- الخطوة 2: اختيار التاريخ، الأصناف، الكميات، والملاحظات ---
+# الخطوة الثانية: اختيار المنتجات وحساب التكلفة تلقائياً
 elif st.session_state.step == 2:
-    st.subheader(f"الخطوة 2 من 2: تفاصيل طلب {st.session_state.customer_name}")
+  st.subheader(
+      f"الخطوة 2 من 2: اختيار الطلبات لـ {st.session_state.customer_name}"
+  )
 
-    if st.button("→ رجوع لتعديل الاسم"):
-        st.session_state.step = 1
-        st.rerun()
+  st.write("حدد الكميات المطلوبة:")
+  matcha_qty = st.number_input(
+      "🍵 ماتشا (السعر: 15 ريال)", min_value=0, max_value=20, value=0, step=1
+  )
+  ice_qty = st.number_input(
+      "🍦 آيسكريم مانجو🥭 (السعر: 7 ريال)", min_value=0, max_value=20, value=0, step=1
+  )
+  acai_qty = st.number_input(
+      "🫐 أساي (السعر: 25 ريال)", min_value=0, max_value=20, value=0, step=1
+  )
 
-    order_date = st.date_input(
-        "يوم الاستلام المطلوب:",
-        min_value=datetime.date.today(),
-    )
+  # حساب الأسعار التلقائي
+  matcha_price = 15
+  ice_price = 7
+  acai_price = 25
 
-    available_items = [
-        "🍵ماتشا اليوم",
-        "كوب آساي🫐 (قريبا ان شاءالله)",
-        " (نكهة الاسبوع المانجا🥭) ايسكريم",
-    ]
+  total_cost = (
+      (matcha_qty * matcha_price)
+      + (ice_qty * ice_price)
+      + (acai_qty * acai_price)
+  )
 
-    selected_items = st.multiselect(
-        "اختر صنف أو أكثر:",
-        options=available_items,
-        default=[available_items[0]],
-    )
+  st.write("---")
+  st.markdown(f"### 🥋 التوتال الإجمالي: **{total_cost} ريال**")
 
-    quantities = {}
-    if selected_items:
-        st.markdown("**حدد عدد كل صنف:**")
-        for item in selected_items:
-            quantities[item] = st.number_input(
-                f"العدد — {item}",
-                min_value=1,
-                max_value=20,
-                value=1,
-                step=1,
-                key=f"qty_{item}",
-            )
+  col1, col2 = st.columns(2)
+  with col1:
+    if st.button("⬅️ رجوع"):
+      st.session_state.step = 1
+      st.rerun()
 
-    notes_input = st.text_input(
-        "إضافاتك أو ملاحظاتك (اختياري):",
-        value=st.session_state.custom_notes,
-        placeholder="مثال: فواكه معينة للآساي، تقليل التحلية...",
-    )
+  with col2:
+    if st.button("✅ تأكيد وإرسال الطلب"):
+      if total_cost == 0:
+        st.warning("الرجاء اختيار منتج واحد على الأقل.")
+      else:
+        # تجهيز تفاصيل الطلب
+        order_details = []
+        if matcha_qty > 0:
+          order_details.append(f"ماتشا ({matcha_qty})")
+        if ice_qty > 0:
+          order_details.append(f"آيسكريم ({ice_qty})")
+        if acai_qty > 0:
+          order_details.append(f"أساي ({acai_qty})")
 
-    if st.button("تأكيد الطلب المسبق"):
-        if not selected_items:
-            st.warning("اختر صنف واحد على الأقل.")
+        order_summary = ", ".join(order_details)
+
+        new_data = pd.DataFrame([{
+            "الاسم": st.session_state.customer_name,
+            "الطلب": order_summary,
+            "المجموع (ريال)": total_cost,
+            "ملاحظات": st.session_state.customer_notes,
+            "الوقت": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+        }])
+
+        # حفظ في ملف CSV
+        if os.path.exists(FILE_PATH):
+          df_old = pd.read_csv(FILE_PATH)
+          df_final = pd.concat([df_old, new_data], ignore_index=True)
         else:
-            st.session_state.custom_notes = notes_input.strip()
-            items_formatted = " | ".join(
-                [
-                    f"{item} (العدد: {quantities[item]})"
-                    for item in selected_items
-                ]
-            )
-            total_count = sum(quantities.values())
+          df_final = new_data
 
-            order_record = {
-                "تاريخ_الطلب": datetime.datetime.now().strftime(
-                    "%Y-%m-%d %H:%M"
-                ),
-                "الاسم": st.session_state.customer_name,
-                "يوم_الاستلام": str(order_date),
-                "الأصناف_والأعداد": items_formatted,
-                "إجمالي_العدد": total_count,
-                "الملاحظات": (
-                    st.session_state.custom_notes
-                    if st.session_state.custom_notes
-                    else "لا يوجد"
-                ),
-            }
-
-            df_new = pd.DataFrame([order_record])
-            if os.path.exists(FILE_PATH):
-                df_existing = pd.read_csv(FILE_PATH)
-                df_all = pd.concat([df_existing, df_new], ignore_index=True)
-            else:
-                df_all = df_new
-            df_all.to_csv(FILE_PATH, index=False, encoding="utf-8-sig")
-
-            st.session_state.last_order_summary = order_record
-            st.session_state.step = 3
-            st.rerun()
-
-# --- الخطوة 3: صفحة تأكيد الطلب للعميل ---
-elif st.session_state.step == 3:
-    summary = st.session_state.last_order_summary
-    st.success(f"تم تسجيل طلبك يا {summary['الاسم']} بنجاح 🤍")
-
-    st.markdown(f"**يوم الاستلام:** {summary['يوم_الاستلام']}")
-    st.markdown(f"**الطلبات:** {summary['الأصناف_والأعداد']}")
-    st.markdown(f"**إجمالي العدد:** {summary['إجمالي_العدد']}")
-    st.markdown(f"**الملاحظات:** {summary['الملاحظات']}")
-
-    if st.button("تسجيل طلب جديد"):
-        st.session_state.step = 1
-        st.session_state.custom_notes = ""
-        st.session_state.last_order_summary = None
+        df_final.to_csv(FILE_PATH, index=False)
+        st.session_state.last_order_summary = {
+            "name": st.session_state.customer_name,
+            "total": total_cost,
+            "details": order_summary,
+        }
+        st.session_state.step = 3
         st.rerun()
 
-st.write("---")
-st.markdown(
-    "<p style='text-align: center; font-size: 12px; color: gray;'>مصنوع بكل"
-    " عناية بالبيت</p>",
-    unsafe_allow_html=True,
-)
+# الخطوة الثالثة: تأكيد النجاح
+elif st.session_state.step == 3:
+  summary = st.session_state.last_order_summary
+  st.success("🎉 تم تسجيل طلبك بنجاح وعناية فائقة!")
+  if summary:
+    st.info(
+        f"شكراً لكِ يا **{summary['name']}**! طلبك عبارة عن: **{summary['details']}**"
+        f" | الإجمالي المطلوب: **{summary['total']} ريال**."
+    )
+
+  if st.button("تسجيل طلب جديد 💕"):
+    st.session_state.customer_name = ""
+    st.session_state.customer_notes = ""
+    st.session_state.step = 1
+    st.rerun()
