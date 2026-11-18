@@ -45,7 +45,7 @@ with st.sidebar:
 
 # ================= واجهة العميل الأساسية =================
 st.markdown(
-    "<h1 style='text-align: center;'>لمسة لطيفة 🏃‍♀️💨</h1>",
+    "<h1 style='text-align: center;'>لمسة لطيفة 🌴</h1>",
     unsafe_allow_html=True,
 )
 st.markdown(
@@ -57,7 +57,7 @@ st.write("---")
 
 # الخطوة الأولى: بيانات العميل
 if st.session_state.step == 1:
-  st.subheader("الخطوة 1 من 2: بيانات العميل 🥹")
+  st.subheader("الخطوة 1 من 2: بيانات العميل 😎")
   name = st.text_input("اسمك ويا خدمتك:", value=st.session_state.customer_name)
   notes = st.text_area(
       "ملاحظات إضافية (اختياري):", value=st.session_state.customer_notes
