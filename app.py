@@ -3,15 +3,13 @@ import os
 import pandas as pd
 import streamlit as st
 
-st.set_page_config(page_title="ركن لطيفة", page_icon="🍵", layout="centered")
+st.set_page_config(page_title="لمسة لطيفة", page_icon="🍵", layout="centered")
 
 # تهيئة حالة الخطوات والبيانات
 if "step" not in st.session_state:
     st.session_state.step = 1
 if "customer_name" not in st.session_state:
     st.session_state.customer_name = ""
-if "delivery_location" not in st.session_state:
-    st.session_state.delivery_location = "داخل البيت 🏠"
 if "custom_notes" not in st.session_state:
     st.session_state.custom_notes = ""
 if "last_order_summary" not in st.session_state:
@@ -21,7 +19,7 @@ FILE_PATH = "orders.csv"
 
 # العنوان والوصف الهادئ
 st.markdown(
-    "<h1 style='text-align: center; color: #385e42;'>ركن لطيفة</h1>",
+    "<h1 style='text-align: center; color: #385e42;'>لمسة لطيفة</h1>",
     unsafe_allow_html=True,
 )
 st.markdown(
@@ -36,38 +34,29 @@ tab1, tab2 = st.tabs(["تسجيل طلب جديد", "جدول الطلبات (ل
 
 # ==================== التبويب الأول: تسجيل الطلب ====================
 with tab1:
-    # --- الخطوة 1: بيانات الشخص والمكان والملاحظات ---
+    # --- الخطوة 1: الاسم فقط ---
     if st.session_state.step == 1:
-        st.subheader("الخطوة 1 من 2: بياناتك")
+        st.subheader("الخطوة 1 من 2: بيانات العميل")
 
         name_input = st.text_input(
             "اسمك الكريم:",
             value=st.session_state.customer_name,
             placeholder="اكتب اسمك هنا",
         )
-        location_input = st.radio(
-            "وين بيوصلك؟",
-            ["المحمدية 🤍", "المعذر 🏠"],
-            index=(
-                0
-                if st.session_state.delivery_location == "المعذر 🏠""
-                else 1
-            ),
-        if st.button("التالي: اختيار اليوم والطلب ←"):
+
+        if st.button("التالي: اختيار التاريخ والطلب ←"):
             if name_input.strip() == "":
                 st.warning("فضلاً، اكتب اسمك أولاً.")
             else:
                 st.session_state.customer_name = name_input.strip()
-                st.session_state.delivery_location = location_input
-                st.session_state.custom_notes = notes_input.strip()
                 st.session_state.step = 2
                 st.rerun()
 
-    # --- الخطوة 2: اختيار التاريخ، الأصناف المتعددة، والكميات ---
+    # --- الخطوة 2: اختيار التاريخ، الأصناف، الكميات، والملاحظات ---
     elif st.session_state.step == 2:
-        st.subheader(f"الخطوة 2 من 2: جدول طلب {st.session_state.customer_name}")
+        st.subheader(f"الخطوة 2 من 2: تفاصيل طلب {st.session_state.customer_name}")
 
-        if st.button("→ رجوع لتعديل البيانات"):
+        if st.button("→ رجوع لتعديل الاسم"):
             st.session_state.step = 1
             st.rerun()
 
@@ -101,10 +90,18 @@ with tab1:
                     key=f"qty_{item}",
                 )
 
+        # الملاحظات صارت هنا بعد اختيار الأعداد والطلبات
+        notes_input = st.text_input(
+            "إضافاتك أو ملاحظاتك (اختياري):",
+            value=st.session_state.custom_notes,
+            placeholder="مثال: فواكه معينة للآساي، تقليل التحلية...",
+        )
+
         if st.button("تأكيد الطلب المسبق"):
             if not selected_items:
                 st.warning("اختر صنف واحد على الأقل.")
             else:
+                st.session_state.custom_notes = notes_input.strip()
                 items_formatted = " | ".join(
                     [
                         f"{item} (العدد: {quantities[item]})"
@@ -119,7 +116,6 @@ with tab1:
                     ),
                     "الاسم": st.session_state.customer_name,
                     "يوم_الاستلام": str(order_date),
-                    "المكان": st.session_state.delivery_location,
                     "الأصناف_والأعداد": items_formatted,
                     "إجمالي_العدد": total_count,
                     "الملاحظات": (
@@ -148,7 +144,6 @@ with tab1:
         st.success(f"تم تسجيل طلبك يا {summary['الاسم']} بنجاح 🤍")
 
         st.markdown(f"**يوم الاستلام:** {summary['يوم_الاستلام']}")
-        st.markdown(f"**المكان:** {summary['المكان']}")
         st.markdown(f"**الطلبات:** {summary['الأصناف_والأعداد']}")
         st.markdown(f"**إجمالي العدد:** {summary['إجمالي_العدد']}")
         st.markdown(f"**الملاحظات:** {summary['الملاحظات']}")
