@@ -39,7 +39,7 @@ with tab1:
         st.subheader("الخطوة 1 من 2: بيانات العميل")
 
         name_input = st.text_input(
-            "اسمك الكريم:",
+            "🫡اسمك وبالخدمة  :",
             value=st.session_state.customer_name,
             placeholder="اكتب اسمك هنا",
         )
