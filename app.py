@@ -59,9 +59,6 @@ st.write("---")
 if st.session_state.step == 1:
   st.subheader("الخطوة 1 من 2: بيانات العميل 😎")
   name = st.text_input("اسمك ويا خدمتك:", value=st.session_state.customer_name)
-  notes = st.text_area(
-      "ملاحظات إضافية (اختياري):", value=st.session_state.customer_notes
-  )
 
   if st.button("التالي: اختيار المنتجات والكميات ⬅️"):
     if name.strip() == "":
@@ -87,6 +84,9 @@ elif st.session_state.step == 2:
   )
   acai_qty = st.number_input(
       "🫐 أساي (السعر: 25 ريال)", min_value=0, max_value=20, value=0, step=1
+  )
+  notes = st.text_area(
+      "ملاحظات إضافية (اختياري):", value=st.session_state.customer_notes
   )
 
   # حساب الأسعار التلقائي
