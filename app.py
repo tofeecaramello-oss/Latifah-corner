@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 
 st.set_page_config(
-    page_title="لمسة لطيفة",
+    page_title="🌴لمسة لطيفة",
     page_icon="🍵",
     layout="centered",
     initial_sidebar_state="collapsed",
@@ -45,7 +45,7 @@ with st.sidebar:
 
 # ================= واجهة العميل الأساسية =================
 st.markdown(
-    "<h1 style='text-align: center;'>لمسة لطيفة 🌴</h1>",
+    "<h1 style='text-align: center;'>لمسة لطيفة 🏃‍♀️💨</h1>",
     unsafe_allow_html=True,
 )
 st.markdown(
@@ -55,24 +55,24 @@ st.markdown(
 )
 st.write("---")
 
-# الخطوة الأولى: بيانات العميل
+# الخطوة الأولى: بيانات العميل (الاسم فقط)
 if st.session_state.step == 1:
-  st.subheader("الخطوة 1 من 2: بيانات العميل 😎")
+  st.subheader("الخطوة 1 من 2: بيانات العميل 🛌")
   name = st.text_input("اسمك ويا خدمتك:", value=st.session_state.customer_name)
 
-  if st.button("التالي: اختيار المنتجات والكميات ⬅️"):
+  if st.button("التالي: اختيار المنتجات ⬅️"):
     if name.strip() == "":
       st.warning("الرجاء إدخال الاسم قبل المتابعة.")
     else:
       st.session_state.customer_name = name
-      st.session_state.customer_notes = notes
       st.session_state.step = 2
       st.rerun()
 
-# الخطوة الثانية: اختيار المنتجات وحساب التكلفة تلقائياً
+# الخطوة الثانية: اختيار المنتجات، الملاحظات، وحساب التكلفة تلقائياً
 elif st.session_state.step == 2:
   st.subheader(
-      f"الخطوة 2 من 2: اختيار الطلبات لـ {st.session_state.customer_name}"
+      f"الخطوة 2 من 2: اختيار الطلبات والملاحظات لـ"
+      f" {st.session_state.customer_name}"
   )
 
   st.write("حدد الكميات المطلوبة:")
@@ -80,11 +80,19 @@ elif st.session_state.step == 2:
       "🍵 ماتشا (السعر: 15 ريال)", min_value=0, max_value=20, value=0, step=1
   )
   ice_qty = st.number_input(
-      "🍦 آيسكريم مانجو🥭 (السعر: 7 ريال)", min_value=0, max_value=20, value=0, step=1
+      "🍦 آيسكريم (السعر: 7 ريال)", min_value=0, max_value=20, value=0, step=1
   )
   acai_qty = st.number_input(
       "🫐 أساي (السعر: 25 ريال)", min_value=0, max_value=20, value=0, step=1
   )
+
+  st.write("---")
+  # خانة الملاحظات أصبحت هنا بعد اختيار الطلبات
+  notes = st.text_area(
+      "ملاحظات إضافية على الطلب (اختياري):",
+      value=st.session_state.customer_notes,
+  )
+
   # حساب الأسعار التلقائي
   matcha_price = 15
   ice_price = 7
@@ -102,6 +110,9 @@ elif st.session_state.step == 2:
   col1, col2 = st.columns(2)
   with col1:
     if st.button("⬅️ رجوع"):
+      st.session_state.customer_notes = (
+          notes  # حفظ الملاحظة مؤقتاً لو رجع ورا
+      )
       st.session_state.step = 1
       st.rerun()
 
@@ -110,6 +121,8 @@ elif st.session_state.step == 2:
       if total_cost == 0:
         st.warning("الرجاء اختيار منتج واحد على الأقل.")
       else:
+        st.session_state.customer_notes = notes
+
         # تجهيز تفاصيل الطلب
         order_details = []
         if matcha_qty > 0:
@@ -141,6 +154,7 @@ elif st.session_state.step == 2:
             "name": st.session_state.customer_name,
             "total": total_cost,
             "details": order_summary,
+            "notes": st.session_state.customer_notes,
         }
         st.session_state.step = 3
         st.rerun()
@@ -148,14 +162,17 @@ elif st.session_state.step == 2:
 # الخطوة الثالثة: تأكيد النجاح
 elif st.session_state.step == 3:
   summary = st.session_state.last_order_summary
-  st.success("🎉 تم تسجيل طلبك بنجاح وعناية فائقة!")
+  st.success(" 🫶🏼!🥺تم تسجيل طلبك بفضل الله🎉 الله يجعلنا عند حسن ظنكم")
   if summary:
+    note_text = (
+        f" | ملاحظاتك: {summary['notes']}" if summary["notes"].strip() else ""
+    )
     st.info(
         f"شكراً لكِ يا **{summary['name']}**! طلبك عبارة عن: **{summary['details']}**"
-        f" | الإجمالي المطلوب: **{summary['total']} ريال**."
+        f" | الإجمالي: **{summary['total']} ريال**{note_text}."
     )
 
-  if st.button("تسجيل طلب جديد 💕"):
+  if st.button("تسجيل طلب جديد ⛳️"):
     st.session_state.customer_name = ""
     st.session_state.customer_notes = ""
     st.session_state.step = 1
