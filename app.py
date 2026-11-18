@@ -57,8 +57,8 @@ st.write("---")
 
 # الخطوة الأولى: بيانات العميل (الاسم فقط)
 if st.session_state.step == 1:
-  st.subheader("الخطوة 1 من 2: بيانات العميل 🛌")
-  name = st.text_input("اسمك ويا خدمتك:", value=st.session_state.customer_name)
+  st.subheader("الخطوة 1 من 2: بيانات العميل ✌🏼")
+  name = st.text_input("اسمك الله يرضيك 💕:", value=st.session_state.customer_name)
 
   if st.button("التالي: اختيار المنتجات ⬅️"):
     if name.strip() == "":
