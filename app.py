@@ -77,13 +77,13 @@ elif st.session_state.step == 2:
 
   st.write("حدد الكميات المطلوبة:")
   matcha_qty = st.number_input(
-      "🍵 ماتشا (السعر: 15 ريال)", min_value=0, max_value=20, value=0, step=1
+      "🍵 ماتشا (السعر: ١٥ ريال)", min_value=0, max_value=20, value=0, step=1
   )
   ice_qty = st.number_input(
-      "🍦 آيسكريم (السعر: 7 ريال)", min_value=0, max_value=20, value=0, step=1
+      "🍦 آيسكريم مانجو🥭 (السعر: ٧ ريال)", min_value=0, max_value=20, value=0, step=1
   )
   acai_qty = st.number_input(
-      "🫐 أساي (السعر: 25 ريال)", min_value=0, max_value=20, value=0, step=1
+      "🫐 أساي قريبا🚂(السعر: 25 ريال)", min_value=0, max_value=20, value=0, step=1
   )
 
   st.write("---")
