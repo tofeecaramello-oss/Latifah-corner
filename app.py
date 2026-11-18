@@ -85,10 +85,6 @@ elif st.session_state.step == 2:
   acai_qty = st.number_input(
       "🫐 أساي (السعر: 25 ريال)", min_value=0, max_value=20, value=0, step=1
   )
-  notes = st.text_area(
-      "ملاحظات إضافية (اختياري):", value=st.session_state.customer_notes
-  )
-
   # حساب الأسعار التلقائي
   matcha_price = 15
   ice_price = 7
