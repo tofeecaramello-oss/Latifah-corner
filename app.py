@@ -23,7 +23,7 @@ if "last_order_summary" not in st.session_state:
   st.session_state.last_order_summary = None
 
 FILE_PATH = "orders.csv"
-STC_BANK_INFO = "STC Bank - رقم الجوال: 05XXXXXXXX"  # عدّلي هذا السطر برقمك
+STC_BANK_INFO = "STC Bank - رقم الجوال: 0559085927"
 
 ARABIC_DAYS = {
     "Monday": "الاثنين",
@@ -84,8 +84,8 @@ if st.session_state.step == 1:
       "اسمك 💕:", value=st.session_state.customer_name
   )
   phone = st.text_input(
-      "رقم الجوال (للي بيستلم من  🚘 الاستلام من داخل مو"
-      " لازم) :",
+      "رقم الجوال (للي بيستلم من الشارع/برّا فقط، أما الاستلام من داخل مو"
+      " لازم) 📱:",
       value=st.session_state.customer_phone,
       placeholder="05xxxxxxxx (اختياري للاستلام من داخل)",
   )
@@ -176,7 +176,7 @@ elif st.session_state.step == 2:
 
   st.write("---")
   notes = st.text_area(
-      "ملاحظات إضافية (مثل: نوع/لون السيارة عند الاستلام، أو تعديل بالطلب):",
+      "ملاحظات إضافية (مثلا ابيها حاليهه ا):",
       value=st.session_state.customer_notes,
   )
 
