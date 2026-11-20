@@ -45,7 +45,17 @@ with st.sidebar:
       st.dataframe(df)
 
       if not df.empty:
-        if st.button("حذف جميع الطلبات"):
+        # زر تحميل نسخة احتياطية من الطلبات قبل أي تعديل
+        csv_data = df.to_csv(index=False).encode("utf-8-sig")
+        st.download_button(
+            label="📥 تحميل الطلبات (Excel / CSV)",
+            data=csv_data,
+            file_name=f"orders_backup_{datetime.date.today()}.csv",
+            mime="text/csv",
+        )
+
+        st.write("---")
+        if st.button("🗑️ حذف جميع الطلبات"):
           os.remove(FILE_PATH)
           st.rerun()
     else:
@@ -80,11 +90,10 @@ if st.session_state.step == 1:
       st.session_state.step = 2
       st.rerun()
 
-# الخطوة الثانية: اختيار المنتجات، الملاحظات، وحساب التكلفة تلقائياً
+# الخطوة الثانية: اختيار المنتجات، الوقت، الملاحظات، وحساب التكلفة
 elif st.session_state.step == 2:
   st.subheader(
-      f"الخطوة 2 من 2: اختيار الطلبات والملاحظات لـ"
-      f" {st.session_state.customer_name}"
+      f"الخطوة 2 من 2: اختيار الطلبات لـ {st.session_state.customer_name}"
   )
 
   st.write("حدد الكميات المطلوبة:")
@@ -125,7 +134,21 @@ elif st.session_state.step == 2:
   )
 
   st.write("---")
-  # خانة الملاحظات أصبحت هنا بعد اختيار الطلبات
+  st.write("📅 **متى تبي طلبك يكون جاهز؟**")
+  col_date, col_time = st.columns(2)
+  with col_date:
+    selected_date = st.date_input(
+        "اختر اليوم / التاريخ:",
+        value=datetime.date.today(),
+        min_value=datetime.date.today(),
+    )
+  with col_time:
+    selected_time = st.text_input(
+        "الوقت المناسب لك (مثلاً: 5 العصر):",
+        placeholder="اكتب الساعة أو الفترة...",
+    )
+
+  st.write("---")
   notes = st.text_area(
       "ملاحظات إضافية على الطلب (اختياري):",
       value=st.session_state.customer_notes,
@@ -149,9 +172,7 @@ elif st.session_state.step == 2:
   col1, col2 = st.columns(2)
   with col1:
     if st.button("⬅️ رجوع"):
-      st.session_state.customer_notes = (
-          notes  # حفظ الملاحظة مؤقتاً لو رجع ورا
-      )
+      st.session_state.customer_notes = notes
       st.session_state.step = 1
       st.rerun()
 
@@ -159,6 +180,8 @@ elif st.session_state.step == 2:
     if st.button("✅ تأكيد وإرسال الطلب"):
       if total_cost == 0:
         st.warning("الرجاء اختيار منتج واحد على الأقل.")
+      elif selected_time.strip() == "":
+        st.warning("الرجاء كتابة الوقت اللي تبي فيه الطلب.")
       else:
         st.session_state.customer_notes = notes
 
@@ -177,19 +200,17 @@ elif st.session_state.step == 2:
 
         order_summary = ", ".join(order_details)
 
-        now = datetime.datetime.now()
-        day_ar = ARABIC_DAYS.get(now.strftime("%A"), now.strftime("%A"))
-        date_str = now.strftime("%Y-%m-%d")
-        time_str = now.strftime("%I:%M %p")
-        order_datetime_display = f"{day_ar} {date_str} | {time_str}"
+        day_en = selected_date.strftime("%A")
+        day_ar = ARABIC_DAYS.get(day_en, day_en)
+        delivery_schedule = f"{day_ar} ({selected_date}) - {selected_time.strip()}"
 
         new_data = pd.DataFrame([{
             "الاسم": st.session_state.customer_name,
             "الطلب": order_summary,
+            "موعد التسليم": delivery_schedule,
             "المجموع (ريال)": total_cost,
             "ملاحظات": st.session_state.customer_notes,
-            "اليوم": day_ar,
-            "الوقت": f"{date_str} {time_str}",
+            "وقت الإرسال": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
         }])
 
         # حفظ في ملف CSV
@@ -205,7 +226,7 @@ elif st.session_state.step == 2:
             "total": total_cost,
             "details": order_summary,
             "notes": st.session_state.customer_notes,
-            "order_time": order_datetime_display,
+            "schedule": delivery_schedule,
         }
         st.session_state.step = 3
         st.rerun()
@@ -218,14 +239,10 @@ elif st.session_state.step == 3:
     note_text = (
         f" | ملاحظاتك: {summary['notes']}" if summary["notes"].strip() else ""
     )
-    time_text = (
-        f" | وقت الطلب: **{summary['order_time']}**"
-        if summary.get("order_time")
-        else ""
-    )
     st.info(
         f"شكراً لكِ يا **{summary['name']}**! طلبك عبارة عن: **{summary['details']}**"
-        f" | الإجمالي: **{summary['total']} ريال**{note_text}{time_text}."
+        f" | موعد الاستلام: **{summary['schedule']}**"
+        f" | الإجمالي: **{summary['total']} ريال**{note_text}."
     )
 
   if st.button("تسجيل طلب جديد ⛳️"):
