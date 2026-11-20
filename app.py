@@ -77,26 +77,27 @@ st.markdown(
 )
 st.write("---")
 
-# الخطوة الأولى: بيانات العميل (الاسم ورقم الجوال)
+# الخطوة الأولى: بيانات العميل (الاسم ورقم الجوال لمن يستلم من الشارع)
 if st.session_state.step == 1:
   st.subheader("الخطوة 1 من 2: بيانات العميل ✌🏼")
   name = st.text_input(
       "اسمك الله يرضيك 💕:", value=st.session_state.customer_name
   )
   phone = st.text_input(
-      "رقم جوالك للتواصل عند الوصول عند الباب 📱:",
+      "رقم الجوال (للي بيستلم من الشارع/برّا فقط، أما الاستلام من داخل مو"
+      " لازم) 📱:",
       value=st.session_state.customer_phone,
-      placeholder="05xxxxxxxx",
+      placeholder="05xxxxxxxx (اختياري للاستلام من داخل)",
   )
 
   if st.button("التالي: اختيار المنتجات ⬅️"):
     if name.strip() == "":
       st.warning("الرجاء إدخال الاسم قبل المتابعة.")
-    elif phone.strip() == "":
-      st.warning("الرجاء إدخال رقم الجوال للتواصل وقت الاستلام.")
     else:
       st.session_state.customer_name = name.strip()
-      st.session_state.customer_phone = phone.strip()
+      st.session_state.customer_phone = (
+          phone.strip() if phone.strip() else "استلام من داخل"
+      )
       st.session_state.step = 2
       st.rerun()
 
@@ -273,9 +274,14 @@ elif st.session_state.step == 3:
     note_text = (
         f" | ملاحظاتك: {summary['notes']}" if summary["notes"].strip() else ""
     )
+    phone_text = (
+        f" ({summary['phone']})"
+        if summary["phone"] != "استلام من داخل"
+        else " | استلام من داخل"
+    )
     st.info(
-        f"شكراً لكِ يا **{summary['name']}** ({summary['phone']})! طلبك عبارة"
-        f" عن: **{summary['details']}** | موعد الاستلام:"
+        f"شكراً لكِ يا **{summary['name']}**{phone_text}! طلبك عبارة عن:"
+        f" **{summary['details']}** | موعد الاستلام:"
         f" **{summary['schedule']}**{note_text}."
     )
     st.warning(
