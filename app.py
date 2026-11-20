@@ -22,6 +22,16 @@ if "last_order_summary" not in st.session_state:
 
 FILE_PATH = "orders.csv"
 
+ARABIC_DAYS = {
+    "Monday": "الاثنين",
+    "Tuesday": "الثلاثاء",
+    "Wednesday": "الأربعاء",
+    "Thursday": "الخميس",
+    "Friday": "الجمعة",
+    "Saturday": "السبت",
+    "Sunday": "الأحد",
+}
+
 # ================= القائمة الجانبية السرية (لأصحاب المتجر فقط) =================
 with st.sidebar:
   st.header("🔐 لوحة تحكم الإدارة")
@@ -167,12 +177,19 @@ elif st.session_state.step == 2:
 
         order_summary = ", ".join(order_details)
 
+        now = datetime.datetime.now()
+        day_ar = ARABIC_DAYS.get(now.strftime("%A"), now.strftime("%A"))
+        date_str = now.strftime("%Y-%m-%d")
+        time_str = now.strftime("%I:%M %p")
+        order_datetime_display = f"{day_ar} {date_str} | {time_str}"
+
         new_data = pd.DataFrame([{
             "الاسم": st.session_state.customer_name,
             "الطلب": order_summary,
             "المجموع (ريال)": total_cost,
             "ملاحظات": st.session_state.customer_notes,
-            "الوقت": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "اليوم": day_ar,
+            "الوقت": f"{date_str} {time_str}",
         }])
 
         # حفظ في ملف CSV
@@ -188,6 +205,7 @@ elif st.session_state.step == 2:
             "total": total_cost,
             "details": order_summary,
             "notes": st.session_state.customer_notes,
+            "order_time": order_datetime_display,
         }
         st.session_state.step = 3
         st.rerun()
@@ -200,9 +218,14 @@ elif st.session_state.step == 3:
     note_text = (
         f" | ملاحظاتك: {summary['notes']}" if summary["notes"].strip() else ""
     )
+    time_text = (
+        f" | وقت الطلب: **{summary['order_time']}**"
+        if summary.get("order_time")
+        else ""
+    )
     st.info(
         f"شكراً لكِ يا **{summary['name']}**! طلبك عبارة عن: **{summary['details']}**"
-        f" | الإجمالي: **{summary['total']} ريال**{note_text}."
+        f" | الإجمالي: **{summary['total']} ريال**{note_text}{time_text}."
     )
 
   if st.button("تسجيل طلب جديد ⛳️"):
