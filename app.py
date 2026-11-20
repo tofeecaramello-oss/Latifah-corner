@@ -58,7 +58,9 @@ st.write("---")
 # الخطوة الأولى: بيانات العميل (الاسم فقط)
 if st.session_state.step == 1:
   st.subheader("الخطوة 1 من 2: بيانات العميل ✌🏼")
-  name = st.text_input("اسمك الله يرضيك 💕:", value=st.session_state.customer_name)
+  name = st.text_input(
+      "اسمك الله يرضيك 💕:", value=st.session_state.customer_name
+  )
 
   if st.button("التالي: اختيار المنتجات ⬅️"):
     if name.strip() == "":
@@ -76,14 +78,40 @@ elif st.session_state.step == 2:
   )
 
   st.write("حدد الكميات المطلوبة:")
-  matcha_qty = st.number_input(
-      "🍵 ماتشا (السعر: ١٥ ريال)", min_value=0, max_value=20, value=0, step=1
+  sea_salt_matcha_qty = st.number_input(
+      "🍵 Sea Salt Matcha (السعر: ٢٠ ريال)",
+      min_value=0,
+      max_value=20,
+      value=0,
+      step=1,
+  )
+  classic_matcha_qty = st.number_input(
+      "🍵 Classic Matcha (السعر: ٢٠ ريال)",
+      min_value=0,
+      max_value=20,
+      value=0,
+      step=1,
+  )
+  healthy_matcha_qty = st.number_input(
+      "🍵 Healthy Matcha (السعر: ٢٠ ريال)",
+      min_value=0,
+      max_value=20,
+      value=0,
+      step=1,
   )
   ice_qty = st.number_input(
-      "🍦 آيسكريم مانجو🥭 (السعر: ٧ ريال)", min_value=0, max_value=20, value=0, step=1
+      "🍦 آيسكريم مانجو🥭 (السعر: ١٠ ريال)",
+      min_value=0,
+      max_value=20,
+      value=0,
+      step=1,
   )
   acai_qty = st.number_input(
-      "🫐 أساي قريبا🚂(السعر: 25 ريال)", min_value=0, max_value=20, value=0, step=1
+      "🫐 أساي قريبا🚂(السعر: ٢٨ ريال)",
+      min_value=0,
+      max_value=20,
+      value=0,
+      step=1,
   )
 
   st.write("---")
@@ -94,12 +122,13 @@ elif st.session_state.step == 2:
   )
 
   # حساب الأسعار التلقائي
-  matcha_price = 15
-  ice_price = 7
-  acai_price = 25
+  matcha_price = 20
+  ice_price = 10
+  acai_price = 28
 
+  total_matcha_qty = sea_salt_matcha_qty + classic_matcha_qty + healthy_matcha_qty
   total_cost = (
-      (matcha_qty * matcha_price)
+      (total_matcha_qty * matcha_price)
       + (ice_qty * ice_price)
       + (acai_qty * acai_price)
   )
@@ -125,10 +154,14 @@ elif st.session_state.step == 2:
 
         # تجهيز تفاصيل الطلب
         order_details = []
-        if matcha_qty > 0:
-          order_details.append(f"ماتشا ({matcha_qty})")
+        if sea_salt_matcha_qty > 0:
+          order_details.append(f"Sea Salt Matcha ({sea_salt_matcha_qty})")
+        if classic_matcha_qty > 0:
+          order_details.append(f"Classic Matcha ({classic_matcha_qty})")
+        if healthy_matcha_qty > 0:
+          order_details.append(f"Healthy Matcha ({healthy_matcha_qty})")
         if ice_qty > 0:
-          order_details.append(f"آيسكريم ({ice_qty})")
+          order_details.append(f"آيسكريم مانجو ({ice_qty})")
         if acai_qty > 0:
           order_details.append(f"أساي ({acai_qty})")
 
