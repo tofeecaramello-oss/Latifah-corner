@@ -23,7 +23,7 @@ if "last_order_summary" not in st.session_state:
   st.session_state.last_order_summary = None
 
 FILE_PATH = "orders.csv"
-STC_BANK_INFO = "STC Bank - رقم الجوال: 0559085927"
+STC_BANK_INFO = "STC Bank"
 
 ARABIC_DAYS = {
     "Monday": "الاثنين",
