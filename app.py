@@ -15,12 +15,15 @@ if "step" not in st.session_state:
   st.session_state.step = 1
 if "customer_name" not in st.session_state:
   st.session_state.customer_name = ""
+if "customer_phone" not in st.session_state:
+  st.session_state.customer_phone = ""
 if "customer_notes" not in st.session_state:
   st.session_state.customer_notes = ""
 if "last_order_summary" not in st.session_state:
   st.session_state.last_order_summary = None
 
 FILE_PATH = "orders.csv"
+STC_BANK_INFO = "STC Bank - رقم الجوال: 05XXXXXXXX"  # عدّلي هذا السطر برقمك
 
 ARABIC_DAYS = {
     "Monday": "الاثنين",
@@ -45,7 +48,6 @@ with st.sidebar:
       st.dataframe(df)
 
       if not df.empty:
-        # زر تحميل نسخة احتياطية من الطلبات قبل أي تعديل
         csv_data = df.to_csv(index=False).encode("utf-8-sig")
         st.download_button(
             label="📥 تحميل الطلبات (Excel / CSV)",
@@ -75,25 +77,34 @@ st.markdown(
 )
 st.write("---")
 
-# الخطوة الأولى: بيانات العميل (الاسم فقط)
+# الخطوة الأولى: بيانات العميل (الاسم ورقم الجوال)
 if st.session_state.step == 1:
   st.subheader("الخطوة 1 من 2: بيانات العميل ✌🏼")
   name = st.text_input(
       "اسمك الله يرضيك 💕:", value=st.session_state.customer_name
   )
+  phone = st.text_input(
+      "رقم جوالك للتواصل عند الوصول عند الباب 📱:",
+      value=st.session_state.customer_phone,
+      placeholder="05xxxxxxxx",
+  )
 
   if st.button("التالي: اختيار المنتجات ⬅️"):
     if name.strip() == "":
       st.warning("الرجاء إدخال الاسم قبل المتابعة.")
+    elif phone.strip() == "":
+      st.warning("الرجاء إدخال رقم الجوال للتواصل وقت الاستلام.")
     else:
-      st.session_state.customer_name = name
+      st.session_state.customer_name = name.strip()
+      st.session_state.customer_phone = phone.strip()
       st.session_state.step = 2
       st.rerun()
 
 # الخطوة الثانية: اختيار المنتجات، الوقت، الملاحظات، وحساب التكلفة
 elif st.session_state.step == 2:
   st.subheader(
-      f"الخطوة 2 من 2: اختيار الطلبات لـ {st.session_state.customer_name}"
+      f"الخطوة 2 من 2: اختيار الطلبات والملاحظات لـ"
+      f" {st.session_state.customer_name}"
   )
 
   st.write("حدد الكميات المطلوبة:")
@@ -113,6 +124,20 @@ elif st.session_state.step == 2:
   )
   healthy_matcha_qty = st.number_input(
       "🍵 Healthy Matcha (السعر: ٢٠ ريال)",
+      min_value=0,
+      max_value=20,
+      value=0,
+      step=1,
+  )
+  v60_hot_qty = st.number_input(
+      "☕ V60 حار (السعر: ٢٠ ريال)",
+      min_value=0,
+      max_value=20,
+      value=0,
+      step=1,
+  )
+  v60_iced_qty = st.number_input(
+      "🧊 V60 بارد (السعر: ٢٠ ريال)",
       min_value=0,
       max_value=20,
       value=0,
@@ -150,18 +175,21 @@ elif st.session_state.step == 2:
 
   st.write("---")
   notes = st.text_area(
-      "ملاحظات إضافية على الطلب (اختياري):",
+      "ملاحظات إضافية (مثل: نوع/لون السيارة عند الاستلام، أو تعديل بالطلب):",
       value=st.session_state.customer_notes,
   )
 
   # حساب الأسعار التلقائي
   matcha_price = 20
+  v60_price = 20
   ice_price = 10
   acai_price = 28
 
   total_matcha_qty = sea_salt_matcha_qty + classic_matcha_qty + healthy_matcha_qty
+  total_v60_qty = v60_hot_qty + v60_iced_qty
   total_cost = (
       (total_matcha_qty * matcha_price)
+      + (total_v60_qty * v60_price)
       + (ice_qty * ice_price)
       + (acai_qty * acai_price)
   )
@@ -193,6 +221,10 @@ elif st.session_state.step == 2:
           order_details.append(f"Classic Matcha ({classic_matcha_qty})")
         if healthy_matcha_qty > 0:
           order_details.append(f"Healthy Matcha ({healthy_matcha_qty})")
+        if v60_hot_qty > 0:
+          order_details.append(f"V60 حار ({v60_hot_qty})")
+        if v60_iced_qty > 0:
+          order_details.append(f"V60 بارد ({v60_iced_qty})")
         if ice_qty > 0:
           order_details.append(f"آيسكريم مانجو ({ice_qty})")
         if acai_qty > 0:
@@ -206,6 +238,7 @@ elif st.session_state.step == 2:
 
         new_data = pd.DataFrame([{
             "الاسم": st.session_state.customer_name,
+            "الجوال": st.session_state.customer_phone,
             "الطلب": order_summary,
             "موعد التسليم": delivery_schedule,
             "المجموع (ريال)": total_cost,
@@ -223,6 +256,7 @@ elif st.session_state.step == 2:
         df_final.to_csv(FILE_PATH, index=False)
         st.session_state.last_order_summary = {
             "name": st.session_state.customer_name,
+            "phone": st.session_state.customer_phone,
             "total": total_cost,
             "details": order_summary,
             "notes": st.session_state.customer_notes,
@@ -231,7 +265,7 @@ elif st.session_state.step == 2:
         st.session_state.step = 3
         st.rerun()
 
-# الخطوة الثالثة: تأكيد النجاح
+# الخطوة الثالثة: تأكيد النجاح والدفع
 elif st.session_state.step == 3:
   summary = st.session_state.last_order_summary
   st.success(" 🫶🏼!🥺تم تسجيل طلبك بفضل الله🎉 الله يجعلنا عند حسن ظنكم")
@@ -240,13 +274,19 @@ elif st.session_state.step == 3:
         f" | ملاحظاتك: {summary['notes']}" if summary["notes"].strip() else ""
     )
     st.info(
-        f"شكراً لكِ يا **{summary['name']}**! طلبك عبارة عن: **{summary['details']}**"
-        f" | موعد الاستلام: **{summary['schedule']}**"
-        f" | الإجمالي: **{summary['total']} ريال**{note_text}."
+        f"شكراً لكِ يا **{summary['name']}** ({summary['phone']})! طلبك عبارة"
+        f" عن: **{summary['details']}** | موعد الاستلام:"
+        f" **{summary['schedule']}**{note_text}."
+    )
+    st.warning(
+        f"💳 **الدفع عبر التحويل:**\n"
+        f"المبلغ المطلوب: **{summary['total']} ريال**\n"
+        f"بيانات التحويل: **{STC_BANK_INFO}**"
     )
 
   if st.button("تسجيل طلب جديد ⛳️"):
     st.session_state.customer_name = ""
+    st.session_state.customer_phone = ""
     st.session_state.customer_notes = ""
     st.session_state.step = 1
     st.rerun()
