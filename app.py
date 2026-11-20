@@ -84,8 +84,8 @@ if st.session_state.step == 1:
       "اسمك الله يرضيك 💕:", value=st.session_state.customer_name
   )
   phone = st.text_input(
-      "رقم الجوال (للي بيستلم من الشارع/برّا فقط، أما الاستلام من داخل مو"
-      " لازم) 📱:",
+      "رقم الجوال (للي بيستلم من  🚘 الاستلام من داخل مو"
+      " لازم) :",
       value=st.session_state.customer_phone,
       placeholder="05xxxxxxxx (اختياري للاستلام من داخل)",
   )
