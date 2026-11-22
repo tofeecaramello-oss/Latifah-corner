@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 
 st.set_page_config(
-    page_title="LA coffee🌴",
+    page_title="palm tree🌴",
     page_icon="🍵",
     layout="centered",
     initial_sidebar_state="collapsed",
@@ -67,7 +67,7 @@ with st.sidebar:
 
 # ================= واجهة العميل الأساسية =================
 st.markdown(
-    "<h1 style='text-align: center;'>LA coffee🌴</h1>",
+    "<h1 style='text-align: center;'>palm tree🌴</h1>",
     unsafe_allow_html=True,
 )
 st.markdown(
