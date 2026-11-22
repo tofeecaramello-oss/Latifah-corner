@@ -67,7 +67,7 @@ with st.sidebar:
 
 # ================= واجهة العميل الأساسية =================
 st.markdown(
-    "<h1 style='text-align: center;'>لمسة لطيفة 🌴</h1>",
+    "<h1 style='text-align: center;'>LA coffee🌴</h1>",
     unsafe_allow_html=True,
 )
 st.markdown(
