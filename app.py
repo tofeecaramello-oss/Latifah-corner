@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 
 st.set_page_config(
-    page_title="🌴لمسة لطيفة",
+    page_title="LA coffee🌴",
     page_icon="🍵",
     layout="centered",
     initial_sidebar_state="collapsed",
