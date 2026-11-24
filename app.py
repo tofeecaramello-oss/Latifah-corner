@@ -127,8 +127,8 @@ if st.session_state.step == 1:
       "اسمك  💕:", value=st.session_state.customer_name
   )
   phone_label = (
-      "رقم الجوال (للي بيستلم من برّا فقط، الاستلام من داخل مو"
-      " لازم) :"
+      "رقم الجوال (للي بيستلم من برّا اول     "
+      " مرة) :"
   )
   phone = st.text_input(
       phone_label,
@@ -204,7 +204,7 @@ elif st.session_state.step == 2:
       step=1,
   )
   brownie_qty = st.number_input(
-      "🍫  brownie للجمعات (السعر: ١١٠ ريال)",
+      "🍫  brownie للجمعات وقبل ب ٣ ايام الطلب(السعر: ١١٠ ريال)",
       min_value=0,
       max_value=20,
       value=0,
@@ -229,7 +229,7 @@ elif st.session_state.step == 2:
       step=1,
   )
   jowza_gathering_qty = st.number_input(
-      "🥥 حلا جوزاء بارد - للجمعات (السعر: ١١٠ ريال)",
+      "🥥 حلا جوزاء بارد - للجمعات وقبل بيوم الطلب (السعر: ١١٠ ريال)",
       min_value=0,
       max_value=20,
       value=0,
