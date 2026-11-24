@@ -4,12 +4,13 @@ import pandas as pd
 import streamlit as st
 
 st.set_page_config(
-    page_title="🌴palm tree",
+    page_title="🌴palm tree ",
     page_icon="🌴",
     layout="centered",
     initial_sidebar_state="collapsed",
 )
 
+# تهيئة حالة الخطوات والبيانات
 if "step" not in st.session_state:
   st.session_state.step = 1
 if "customer_name" not in st.session_state:
@@ -34,6 +35,7 @@ ARABIC_DAYS = {
     "Sunday": "الأحد",
 }
 
+# ================= القائمة الجانبية السرية (لأصحاب المتجر فقط) =================
 with st.sidebar:
   st.header("🔐 لوحة تحكم الإدارة")
   admin_pass = st.text_input("أدخل الرقم السري:", type="password")
@@ -63,8 +65,9 @@ with st.sidebar:
   elif admin_pass:
     st.error("الرقم السري خاطئ.")
 
+# ================= واجهة العميل الأساسية =================
 st.markdown(
-    "<h1 style='text-align: center;'>palm tree 🌴</h1>",
+    "<h1 style='text-align: center;'>palm tree  🌴</h1>",
     unsafe_allow_html=True,
 )
 st.markdown(
@@ -74,17 +77,15 @@ st.markdown(
 )
 st.write("---")
 
+# الخطوة الأولى: بيانات العميل (الاسم ورقم الجوال لمن يستلم من الشارع)
 if st.session_state.step == 1:
   st.subheader("الخطوة 1 من 2: بيانات العميل ✌🏼")
   name = st.text_input(
       "اسمك الله يرضيك 💕:", value=st.session_state.customer_name
   )
-  phone_label = (
-      "رقم الجوال (للي بيستلم من الشارع/برّا فقط، أما الاستلام من داخل مو"
-      " لازم) 📱:"
-  )
   phone = st.text_input(
-      phone_label,
+      "رقم جوالك (للي بيستلم من الشارع/برّا فقط، أما الاستلام من داخل مو"
+      " لازم) 📱:",
       value=st.session_state.customer_phone,
       placeholder="05xxxxxxxx (اختياري للاستلام من داخل)",
   )
@@ -100,6 +101,7 @@ if st.session_state.step == 1:
       st.session_state.step = 2
       st.rerun()
 
+# الخطوة الثانية: اختيار المنتجات، الوقت، الملاحظات، وحساب التكلفة
 elif st.session_state.step == 2:
   st.subheader(
       f"الخطوة 2 من 2: اختيار الطلبات والملاحظات لـ"
@@ -157,7 +159,7 @@ elif st.session_state.step == 2:
       step=1,
   )
   brownie_qty = st.number_input(
-      "🍫 palm tree brownie (السعر: ١١٠ ريال)",
+      " palm tree brownie🍫 (السعر: ١١٠ ريال)",
       min_value=0,
       max_value=20,
       value=0,
@@ -180,11 +182,12 @@ elif st.session_state.step == 2:
     )
 
   st.write("---")
-  notes_label = (
-      "ملاحظات إضافية (مثل: نوع/لون السيارة عند الاستلام، أو تعديل بالطلب):"
+  notes = st.text_area(
+      "ملاحظات إضافية (مثل: نوع/لون السيارة عند الاستلام، أو تعديل بالطلب):",
+      value=st.session_state.customer_notes,
   )
-  notes = st.text_area(notes_label, value=st.session_state.customer_notes)
 
+  # حساب الأسعار التلقائي
   matcha_price = 20
   v60_price = 20
   ice_price = 10
@@ -220,6 +223,7 @@ elif st.session_state.step == 2:
       else:
         st.session_state.customer_notes = notes
 
+        # تجهيز تفاصيل الطلب
         order_details = []
         if sea_salt_matcha_qty > 0:
           order_details.append(f"Sea Salt Matcha ({sea_salt_matcha_qty})")
@@ -254,6 +258,7 @@ elif st.session_state.step == 2:
             "وقت الإرسال": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
         }])
 
+        # حفظ في ملف CSV
         if os.path.exists(FILE_PATH):
           df_old = pd.read_csv(FILE_PATH)
           df_final = pd.concat([df_old, new_data], ignore_index=True)
@@ -272,5 +277,33 @@ elif st.session_state.step == 2:
         st.session_state.step = 3
         st.rerun()
 
+# الخطوة الثالثة: تأكيد النجاح والدفع
 elif st.session_state.step == 3:
-  
+  summary = st.session_state.last_order_summary
+  st.success(" 🫶🏼!🥺تم تسجيل طلبك بفضل الله🎉 الله يجعلنا عند حسن ظنكم")
+  if summary:
+    note_text = (
+        f" | ملاحظاتك: {summary['notes']}" if summary["notes"].strip() else ""
+    )
+    phone_text = (
+        f" ({summary['phone']})"
+        if summary["phone"] != "استلام من داخل"
+        else " | استلام من داخل"
+    )
+    st.info(
+        f"شكراً لكِ يا **{summary['name']}**{phone_text}! طلبك عبارة عن:"
+        f" **{summary['details']}** | موعد الاستلام:"
+        f" **{summary['schedule']}**{note_text}."
+    )
+    st.warning(
+        f"💳 **الدفع عبر التحويل:**\n"
+        f"المبلغ المطلوب: **{summary['total']} ريال**\n"
+        f"بيانات التحويل: **{STC_BANK_INFO}**"
+    )
+
+  if st.button("تسجيل طلب جديد ⛳️"):
+    st.session_state.customer_name = ""
+    st.session_state.customer_phone = ""
+    st.session_state.customer_notes = ""
+    st.session_state.step = 1
+    st.rerun()
