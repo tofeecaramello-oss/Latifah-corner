@@ -81,11 +81,11 @@ st.write("---")
 if st.session_state.step == 1:
   st.subheader("الخطوة 1 من 2: بيانات العميل ✌🏼")
   name = st.text_input(
-      "اسمك الله يرضيك 💕:", value=st.session_state.customer_name
+      "اسمك 
+      💕:", value=st.session_state.customer_name
   )
   phone = st.text_input(
-      "رقم جوالك (للي بيستلم من برّا، 
-      " ) :",
+      "رقم جوالك (للي بيستلم من برّا، :",
       value=st.session_state.customer_phone,
       placeholder="05xxxxxxxx (اختياري للاستلام من داخل)",
   )
