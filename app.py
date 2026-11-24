@@ -10,7 +10,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# تهيئة حالة الخطوات والبيانات
 if "step" not in st.session_state:
   st.session_state.step = 1
 if "customer_name" not in st.session_state:
@@ -35,7 +34,12 @@ ARABIC_DAYS = {
     "Sunday": "الأحد",
 }
 
-# ================= القائمة الجانبية السرية (لأصحاب المتجر فقط) =================
+
+def show_image_if_exists(path, caption=None, width=240):
+  if os.path.exists(path):
+    st.image(path, caption=caption, width=width)
+
+
 with st.sidebar:
   st.header("🔐 لوحة تحكم الإدارة")
   admin_pass = st.text_input("أدخل الرقم السري:", type="password")
@@ -65,7 +69,29 @@ with st.sidebar:
   elif admin_pass:
     st.error("الرقم السري خاطئ.")
 
-# ================= واجهة العميل الأساسية =================
+# تكبير الخط للمستخدم في واجهة الطلب
+st.markdown(
+    """
+    <style>
+    .stApp .main .block-container p,
+    .stApp .main .block-container label,
+    .stApp .main .block-container .stMarkdown,
+    .stApp .main .block-container input,
+    .stApp .main .block-container textarea,
+    .stApp .main .block-container button {
+        font-size: 18px !important;
+    }
+    .stApp .main .block-container h2 {
+        font-size: 26px !important;
+    }
+    .stApp .main .block-container h3 {
+        font-size: 24px !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 st.markdown(
     "<h1 style='text-align: center;'>palm tree 🌴</h1>",
     unsafe_allow_html=True,
@@ -75,17 +101,22 @@ st.markdown(
     " يغنيك عن برا ✨</p>",
     unsafe_allow_html=True,
 )
+
+show_image_if_exists("images/banner.jpg", width=260)
+
 st.write("---")
 
-# الخطوة الأولى: بيانات العميل (الاسم ورقم الجوال لمن يستلم من الشارع)
 if st.session_state.step == 1:
   st.subheader("الخطوة 1 من 2: بيانات العميل ✌🏼")
   name = st.text_input(
       "اسمك الله يرضيك 💕:", value=st.session_state.customer_name
   )
+  phone_label = (
+      "رقم الجوال (للي بيستلم من الشارع/برّا فقط، أما الاستلام من داخل مو"
+      " لازم) 📱:"
+  )
   phone = st.text_input(
-      "رقم جوالك (للي بيستلم من الشارع/برّا فقط، أما الاستلام من داخل مو"
-      " لازم) 📱:",
+      phone_label,
       value=st.session_state.customer_phone,
       placeholder="05xxxxxxxx (اختياري للاستلام من داخل)",
   )
@@ -101,7 +132,6 @@ if st.session_state.step == 1:
       st.session_state.step = 2
       st.rerun()
 
-# الخطوة الثانية: اختيار المنتجات، الوقت، الملاحظات، وحساب التكلفة
 elif st.session_state.step == 2:
   st.subheader(
       f"الخطوة 2 من 2: اختيار الطلبات والملاحظات لـ"
@@ -159,7 +189,32 @@ elif st.session_state.step == 2:
       step=1,
   )
   brownie_qty = st.number_input(
-      "🍫 brownie (السعر: ١١٠ ريال)",
+      "🍫 palm tree brownie (السعر: ١١٠ ريال)",
+      min_value=0,
+      max_value=20,
+      value=0,
+      step=1,
+  )
+  brownie_single_qty = st.number_input(
+      "🍫 brownie - لشخص (السعر: ١٠ ريال)",
+      min_value=0,
+      max_value=20,
+      value=0,
+      step=1,
+  )
+  show_image_if_exists(
+      "images/brownie.jpg", caption="palm tree brownie", width=220
+  )
+
+  jowza_single_qty = st.number_input(
+      "🥥 حلا جوزاء بارد - لشخص (السعر: ١٠ ريال)",
+      min_value=0,
+      max_value=20,
+      value=0,
+      step=1,
+  )
+  jowza_gathering_qty = st.number_input(
+      "🥥 حلا جوزاء بارد - للجمعات (السعر: ١١٠ ريال)",
       min_value=0,
       max_value=20,
       value=0,
@@ -182,17 +237,19 @@ elif st.session_state.step == 2:
     )
 
   st.write("---")
-  notes = st.text_area(
-      "ملاحظات إضافية (مثل: نوع/لون السيارة عند الاستلام، أو تعديل بالطلب):",
-      value=st.session_state.customer_notes,
+  notes_label = (
+      "ملاحظات إضافية (مثل: نوع/لون السيارة عند الاستلام، أو تعديل بالطلب):"
   )
+  notes = st.text_area(notes_label, value=st.session_state.customer_notes)
 
-  # حساب الأسعار التلقائي
   matcha_price = 20
   v60_price = 20
   ice_price = 10
   acai_price = 28
   brownie_price = 110
+  brownie_single_price = 10
+  jowza_single_price = 10
+  jowza_gathering_price = 110
 
   total_matcha_qty = sea_salt_matcha_qty + classic_matcha_qty + healthy_matcha_qty
   total_v60_qty = v60_hot_qty + v60_iced_qty
@@ -202,6 +259,9 @@ elif st.session_state.step == 2:
       + (ice_qty * ice_price)
       + (acai_qty * acai_price)
       + (brownie_qty * brownie_price)
+      + (brownie_single_qty * brownie_single_price)
+      + (jowza_single_qty * jowza_single_price)
+      + (jowza_gathering_qty * jowza_gathering_price)
   )
 
   st.write("---")
@@ -223,7 +283,6 @@ elif st.session_state.step == 2:
       else:
         st.session_state.customer_notes = notes
 
-        # تجهيز تفاصيل الطلب
         order_details = []
         if sea_salt_matcha_qty > 0:
           order_details.append(f"Sea Salt Matcha ({sea_salt_matcha_qty})")
@@ -240,7 +299,17 @@ elif st.session_state.step == 2:
         if acai_qty > 0:
           order_details.append(f"أساي ({acai_qty})")
         if brownie_qty > 0:
-          order_details.append(f"brownie ({brownie_qty})")
+          order_details.append(f"palm tree brownie ({brownie_qty})")
+        if brownie_single_qty > 0:
+          order_details.append(f"brownie - لشخص ({brownie_single_qty})")
+        if jowza_single_qty > 0:
+          order_details.append(
+              f"حلا جوزاء بارد - لشخص ({jowza_single_qty})"
+          )
+        if jowza_gathering_qty > 0:
+          order_details.append(
+              f"حلا جوزاء بارد - للجمعات ({jowza_gathering_qty})"
+          )
 
         order_summary = ", ".join(order_details)
 
@@ -258,7 +327,6 @@ elif st.session_state.step == 2:
             "وقت الإرسال": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
         }])
 
-        # حفظ في ملف CSV
         if os.path.exists(FILE_PATH):
           df_old = pd.read_csv(FILE_PATH)
           df_final = pd.concat([df_old, new_data], ignore_index=True)
@@ -277,7 +345,6 @@ elif st.session_state.step == 2:
         st.session_state.step = 3
         st.rerun()
 
-# الخطوة الثالثة: تأكيد النجاح والدفع
 elif st.session_state.step == 3:
   summary = st.session_state.last_order_summary
   st.success(" 🫶🏼!🥺تم تسجيل طلبك بفضل الله🎉 الله يجعلنا عند حسن ظنكم")
