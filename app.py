@@ -183,7 +183,7 @@ elif st.session_state.step == 2:
 
   st.write("---")
   notes = st.text_area(
-      "ملاحظات إضافية (مثل: نوع/لون السيارة عند الاستلام، أو تعديل بالطلب):",
+      "ملاحظات إضافية (مثل: تعديل بالطلب):",
       value=st.session_state.customer_notes,
   )
 
