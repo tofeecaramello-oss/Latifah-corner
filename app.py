@@ -4,8 +4,8 @@ import pandas as pd
 import streamlit as st
 
 st.set_page_config(
-    page_title="palm tree🌴",
-    page_icon="🍵",
+    page_title="🌴palm tree brownie",
+    page_icon="🌴",
     layout="centered",
     initial_sidebar_state="collapsed",
 )
@@ -23,7 +23,7 @@ if "last_order_summary" not in st.session_state:
   st.session_state.last_order_summary = None
 
 FILE_PATH = "orders.csv"
-STC_BANK_INFO = "STC Bank"
+STC_BANK_INFO = "STC Bank - رقم الجوال: 0559085927"
 
 ARABIC_DAYS = {
     "Monday": "الاثنين",
@@ -67,7 +67,7 @@ with st.sidebar:
 
 # ================= واجهة العميل الأساسية =================
 st.markdown(
-    "<h1 style='text-align: center;'>palm tree🌴</h1>",
+    "<h1 style='text-align: center;'>palm tree brownie 🌴</h1>",
     unsafe_allow_html=True,
 )
 st.markdown(
@@ -81,10 +81,10 @@ st.write("---")
 if st.session_state.step == 1:
   st.subheader("الخطوة 1 من 2: بيانات العميل ✌🏼")
   name = st.text_input(
-      "اسمك 💕:", value=st.session_state.customer_name
+      "اسمك الله يرضيك 💕:", value=st.session_state.customer_name
   )
   phone = st.text_input(
-      "رقم الجوال (للي بيستلم من الشارع/برّا فقط، أما الاستلام من داخل مو"
+      "رقم جوالك (للي بيستلم من الشارع/برّا فقط، أما الاستلام من داخل مو"
       " لازم) 📱:",
       value=st.session_state.customer_phone,
       placeholder="05xxxxxxxx (اختياري للاستلام من داخل)",
@@ -158,6 +158,13 @@ elif st.session_state.step == 2:
       value=0,
       step=1,
   )
+  brownie_qty = st.number_input(
+      "🍫 براوني (السعر: ١١٠ ريال)",
+      min_value=0,
+      max_value=20,
+      value=0,
+      step=1,
+  )
 
   st.write("---")
   st.write("📅 **متى تبي طلبك يكون جاهز؟**")
@@ -176,7 +183,7 @@ elif st.session_state.step == 2:
 
   st.write("---")
   notes = st.text_area(
-      "ملاحظات إضافية (مثلا ابيها حاليهه ا):",
+      "ملاحظات إضافية (مثل: نوع/لون السيارة عند الاستلام، أو تعديل بالطلب):",
       value=st.session_state.customer_notes,
   )
 
@@ -185,6 +192,7 @@ elif st.session_state.step == 2:
   v60_price = 20
   ice_price = 10
   acai_price = 28
+  brownie_price = 110
 
   total_matcha_qty = sea_salt_matcha_qty + classic_matcha_qty + healthy_matcha_qty
   total_v60_qty = v60_hot_qty + v60_iced_qty
@@ -193,6 +201,7 @@ elif st.session_state.step == 2:
       + (total_v60_qty * v60_price)
       + (ice_qty * ice_price)
       + (acai_qty * acai_price)
+      + (brownie_qty * brownie_price)
   )
 
   st.write("---")
@@ -230,6 +239,8 @@ elif st.session_state.step == 2:
           order_details.append(f"آيسكريم مانجو ({ice_qty})")
         if acai_qty > 0:
           order_details.append(f"أساي ({acai_qty})")
+        if brownie_qty > 0:
+          order_details.append(f"براوني ({brownie_qty})")
 
         order_summary = ", ".join(order_details)
 
