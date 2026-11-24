@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 
 st.set_page_config(
-    page_title="🌴palm tree ",
+    page_title="🌴palm tree",
     page_icon="🌴",
     layout="centered",
     initial_sidebar_state="collapsed",
@@ -67,7 +67,7 @@ with st.sidebar:
 
 # ================= واجهة العميل الأساسية =================
 st.markdown(
-    "<h1 style='text-align: center;'>palm tree  🌴</h1>",
+    "<h1 style='text-align: center;'>palm tree 🌴</h1>",
     unsafe_allow_html=True,
 )
 st.markdown(
@@ -81,11 +81,11 @@ st.write("---")
 if st.session_state.step == 1:
   st.subheader("الخطوة 1 من 2: بيانات العميل ✌🏼")
   name = st.text_input(
-      "اسمك 
-      💕:", value=st.session_state.customer_name
+      "اسمك الله يرضيك 💕:", value=st.session_state.customer_name
   )
   phone = st.text_input(
-      "رقم جوالك (للي بيستلم من برّا، :",
+      "رقم جوالك (للي بيستلم من الشارع/برّا فقط، أما الاستلام من داخل مو"
+      " لازم) 📱:",
       value=st.session_state.customer_phone,
       placeholder="05xxxxxxxx (اختياري للاستلام من داخل)",
   )
@@ -159,7 +159,7 @@ elif st.session_state.step == 2:
       step=1,
   )
   brownie_qty = st.number_input(
-      " palm tree brownie🍫 (السعر: ١١٠ ريال)",
+      "🍫 brownie (السعر: ١١٠ ريال)",
       min_value=0,
       max_value=20,
       value=0,
@@ -183,7 +183,7 @@ elif st.session_state.step == 2:
 
   st.write("---")
   notes = st.text_area(
-      "ملاحظات إضافية (مثل: تعديل بالطلب):",
+      "ملاحظات إضافية (مثل: نوع/لون السيارة عند الاستلام، أو تعديل بالطلب):",
       value=st.session_state.customer_notes,
   )
 
@@ -240,7 +240,7 @@ elif st.session_state.step == 2:
         if acai_qty > 0:
           order_details.append(f"أساي ({acai_qty})")
         if brownie_qty > 0:
-          order_details.append(f"palm tree brownie ({brownie_qty})")
+          order_details.append(f"brownie ({brownie_qty})")
 
         order_summary = ", ".join(order_details)
 
