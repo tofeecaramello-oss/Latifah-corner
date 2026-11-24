@@ -123,13 +123,8 @@ st.write("---")
 
 if st.session_state.step == 1:
   st.subheader("الخطوة 1 من 2: بيانات العميل ✌🏼")
-  name = st.text_input(
-      "اسمك  💕:", value=st.session_state.customer_name
-  )
-  phone_label = (
-      "رقم الجوال (للي بيستلم من برّا اول     "
-      " مرة) :"
-  )
+  name = st.text_input("اسمك  💕:", value=st.session_state.customer_name)
+  phone_label = "رقم الجوال (للي بيستلم من برّا اول     " " مرة) :"
   phone = st.text_input(
       phone_label,
       value=st.session_state.customer_phone,
@@ -196,6 +191,13 @@ elif st.session_state.step == 2:
       value=0,
       step=1,
   )
+  mango_ice_qty = st.number_input(
+      "🥭 آيسكريم مانجو (السعر: ١٠ ريال)",
+      min_value=0,
+      max_value=20,
+      value=0,
+      step=1,
+  )
   acai_qty = st.number_input(
       "🫐 أساي قريبا🚂(السعر: ٢٨ ريال)",
       min_value=0,
@@ -252,14 +254,13 @@ elif st.session_state.step == 2:
     )
 
   st.write("---")
-  notes_label = (
-      "ملاحظات إضافية (مثل: اضافه او تعديل بالطلب):"
-  )
+  notes_label = "ملاحظات إضافية (مثل: اضافه او تعديل بالطلب):"
   notes = st.text_area(notes_label, value=st.session_state.customer_notes)
 
   matcha_price = 20
   v60_price = 20
   ice_price = 10
+  mango_ice_price = 10
   acai_price = 28
   brownie_price = 110
   brownie_single_price = 10
@@ -272,6 +273,7 @@ elif st.session_state.step == 2:
       (total_matcha_qty * matcha_price)
       + (total_v60_qty * v60_price)
       + (ice_qty * ice_price)
+      + (mango_ice_qty * mango_ice_price)
       + (acai_qty * acai_price)
       + (brownie_qty * brownie_price)
       + (brownie_single_qty * brownie_single_price)
@@ -310,7 +312,11 @@ elif st.session_state.step == 2:
         if v60_iced_qty > 0:
           order_details.append(f"V60 بارد ({v60_iced_qty})")
         if ice_qty > 0:
-          order_details.append(f"آيسكريم مانجو ({ice_qty})")
+          order_details.append(
+              f"vanilla ice cream with mango ({ice_qty})"
+          )
+        if mango_ice_qty > 0:
+          order_details.append(f"آيسكريم مانجو ({mango_ice_qty})")
         if acai_qty > 0:
           order_details.append(f"أساي ({acai_qty})")
         if brownie_qty > 0:
