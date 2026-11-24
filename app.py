@@ -89,7 +89,7 @@ st.markdown(
     [data-testid="stTextArea"] label p,
     [data-testid="stDateInput"] label,
     [data-testid="stDateInput"] label p {
-        font-size: 32px !important;
+        font-size: 26px !important;
         line-height: 1.45 !important;
     }
     [data-testid="stNumberInput"] label,
