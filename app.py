@@ -10,7 +10,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# تهيئة حالة الخطوات والبيانات
 if "step" not in st.session_state:
   st.session_state.step = 1
 if "customer_name" not in st.session_state:
@@ -35,7 +34,6 @@ ARABIC_DAYS = {
     "Sunday": "الأحد",
 }
 
-# ================= القائمة الجانبية السرية (لأصحاب المتجر فقط) =================
 with st.sidebar:
   st.header("🔐 لوحة تحكم الإدارة")
   admin_pass = st.text_input("أدخل الرقم السري:", type="password")
@@ -65,7 +63,6 @@ with st.sidebar:
   elif admin_pass:
     st.error("الرقم السري خاطئ.")
 
-# ================= واجهة العميل الأساسية =================
 st.markdown(
     "<h1 style='text-align: center;'>palm tree 🌴</h1>",
     unsafe_allow_html=True,
@@ -77,15 +74,17 @@ st.markdown(
 )
 st.write("---")
 
-# الخطوة الأولى: بيانات العميل (الاسم ورقم الجوال لمن يستلم من الشارع)
 if st.session_state.step == 1:
   st.subheader("الخطوة 1 من 2: بيانات العميل ✌🏼")
   name = st.text_input(
       "اسمك الله يرضيك 💕:", value=st.session_state.customer_name
   )
+  phone_label = (
+      "رقم الجوال (للي بيستلم من الشارع/برّا فقط، أما الاستلام من داخل مو"
+      " لازم) 📱:"
+  )
   phone = st.text_input(
-      "رقم جوالك (للي بيستلم من الشارع/برّا فقط، أما الاستلام من داخل مو"
-      " لازم) 📱:",
+      phone_label,
       value=st.session_state.customer_phone,
       placeholder="05xxxxxxxx (اختياري للاستلام من داخل)",
   )
@@ -101,7 +100,6 @@ if st.session_state.step == 1:
       st.session_state.step = 2
       st.rerun()
 
-# الخطوة الثانية: اختيار المنتجات، الوقت، الملاحظات، وحساب التكلفة
 elif st.session_state.step == 2:
   st.subheader(
       f"الخطوة 2 من 2: اختيار الطلبات والملاحظات لـ"
@@ -116,33 +114,4 @@ elif st.session_state.step == 2:
       value=0,
       step=1,
   )
-  classic_matcha_qty = st.number_input(
-      "🍵 Classic Matcha (السعر: ٢٠ ريال)",
-      min_value=0,
-      max_value=20,
-      value=0,
-      step=1,
-  )
-  healthy_matcha_qty = st.number_input(
-      "🍵 Healthy Matcha (السعر: ٢٠ ريال)",
-      min_value=0,
-      max_value=20,
-      value=0,
-      step=1,
-  )
-  v60_hot_qty = st.number_input(
-      "☕ V60 حار (السعر: ٢٠ ريال)",
-      min_value=0,
-      max_value=20,
-      value=0,
-      step=1,
-  )
-  v60_iced_qty = st.number_input(
-      "🧊 V60 بارد (السعر: ٢٠ ريال)",
-      min_value=0,
-      max_value=20,
-      value=0,
-      step=1,
-  )
-  ice_qty = st.number_input(
-      "
+  classic_matcha
