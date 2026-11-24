@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 
 st.set_page_config(
-    page_title="🌴palm tree brownie",
+    page_title="🌴palm tree",
     page_icon="🌴",
     layout="centered",
     initial_sidebar_state="collapsed",
@@ -67,7 +67,7 @@ with st.sidebar:
 
 # ================= واجهة العميل الأساسية =================
 st.markdown(
-    "<h1 style='text-align: center;'>palm tree brownie 🌴</h1>",
+    "<h1 style='text-align: center;'>palm tree 🌴</h1>",
     unsafe_allow_html=True,
 )
 st.markdown(
@@ -145,165 +145,4 @@ elif st.session_state.step == 2:
       step=1,
   )
   ice_qty = st.number_input(
-      "🍦 آيسكريم مانجو🥭 (السعر: ١٠ ريال)",
-      min_value=0,
-      max_value=20,
-      value=0,
-      step=1,
-  )
-  acai_qty = st.number_input(
-      "🫐 أساي قريبا🚂(السعر: ٢٨ ريال)",
-      min_value=0,
-      max_value=20,
-      value=0,
-      step=1,
-  )
-  brownie_qty = st.number_input(
-      "🍫 براوني (السعر: ١١٠ ريال)",
-      min_value=0,
-      max_value=20,
-      value=0,
-      step=1,
-  )
-
-  st.write("---")
-  st.write("📅 **متى تبي طلبك يكون جاهز؟**")
-  col_date, col_time = st.columns(2)
-  with col_date:
-    selected_date = st.date_input(
-        "اختر اليوم / التاريخ:",
-        value=datetime.date.today(),
-        min_value=datetime.date.today(),
-    )
-  with col_time:
-    selected_time = st.text_input(
-        "الوقت المناسب لك (مثلاً: 5 العصر):",
-        placeholder="اكتب الساعة أو الفترة...",
-    )
-
-  st.write("---")
-  notes = st.text_area(
-      "ملاحظات إضافية (مثل: نوع/لون السيارة عند الاستلام، أو تعديل بالطلب):",
-      value=st.session_state.customer_notes,
-  )
-
-  # حساب الأسعار التلقائي
-  matcha_price = 20
-  v60_price = 20
-  ice_price = 10
-  acai_price = 28
-  brownie_price = 110
-
-  total_matcha_qty = sea_salt_matcha_qty + classic_matcha_qty + healthy_matcha_qty
-  total_v60_qty = v60_hot_qty + v60_iced_qty
-  total_cost = (
-      (total_matcha_qty * matcha_price)
-      + (total_v60_qty * v60_price)
-      + (ice_qty * ice_price)
-      + (acai_qty * acai_price)
-      + (brownie_qty * brownie_price)
-  )
-
-  st.write("---")
-  st.markdown(f"### 🥋 التوتال الإجمالي: **{total_cost} ريال**")
-
-  col1, col2 = st.columns(2)
-  with col1:
-    if st.button("⬅️ رجوع"):
-      st.session_state.customer_notes = notes
-      st.session_state.step = 1
-      st.rerun()
-
-  with col2:
-    if st.button("✅ تأكيد وإرسال الطلب"):
-      if total_cost == 0:
-        st.warning("الرجاء اختيار منتج واحد على الأقل.")
-      elif selected_time.strip() == "":
-        st.warning("الرجاء كتابة الوقت اللي تبي فيه الطلب.")
-      else:
-        st.session_state.customer_notes = notes
-
-        # تجهيز تفاصيل الطلب
-        order_details = []
-        if sea_salt_matcha_qty > 0:
-          order_details.append(f"Sea Salt Matcha ({sea_salt_matcha_qty})")
-        if classic_matcha_qty > 0:
-          order_details.append(f"Classic Matcha ({classic_matcha_qty})")
-        if healthy_matcha_qty > 0:
-          order_details.append(f"Healthy Matcha ({healthy_matcha_qty})")
-        if v60_hot_qty > 0:
-          order_details.append(f"V60 حار ({v60_hot_qty})")
-        if v60_iced_qty > 0:
-          order_details.append(f"V60 بارد ({v60_iced_qty})")
-        if ice_qty > 0:
-          order_details.append(f"آيسكريم مانجو ({ice_qty})")
-        if acai_qty > 0:
-          order_details.append(f"أساي ({acai_qty})")
-        if brownie_qty > 0:
-          order_details.append(f"براوني ({brownie_qty})")
-
-        order_summary = ", ".join(order_details)
-
-        day_en = selected_date.strftime("%A")
-        day_ar = ARABIC_DAYS.get(day_en, day_en)
-        delivery_schedule = f"{day_ar} ({selected_date}) - {selected_time.strip()}"
-
-        new_data = pd.DataFrame([{
-            "الاسم": st.session_state.customer_name,
-            "الجوال": st.session_state.customer_phone,
-            "الطلب": order_summary,
-            "موعد التسليم": delivery_schedule,
-            "المجموع (ريال)": total_cost,
-            "ملاحظات": st.session_state.customer_notes,
-            "وقت الإرسال": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
-        }])
-
-        # حفظ في ملف CSV
-        if os.path.exists(FILE_PATH):
-          df_old = pd.read_csv(FILE_PATH)
-          df_final = pd.concat([df_old, new_data], ignore_index=True)
-        else:
-          df_final = new_data
-
-        df_final.to_csv(FILE_PATH, index=False)
-        st.session_state.last_order_summary = {
-            "name": st.session_state.customer_name,
-            "phone": st.session_state.customer_phone,
-            "total": total_cost,
-            "details": order_summary,
-            "notes": st.session_state.customer_notes,
-            "schedule": delivery_schedule,
-        }
-        st.session_state.step = 3
-        st.rerun()
-
-# الخطوة الثالثة: تأكيد النجاح والدفع
-elif st.session_state.step == 3:
-  summary = st.session_state.last_order_summary
-  st.success(" 🫶🏼!🥺تم تسجيل طلبك بفضل الله🎉 الله يجعلنا عند حسن ظنكم")
-  if summary:
-    note_text = (
-        f" | ملاحظاتك: {summary['notes']}" if summary["notes"].strip() else ""
-    )
-    phone_text = (
-        f" ({summary['phone']})"
-        if summary["phone"] != "استلام من داخل"
-        else " | استلام من داخل"
-    )
-    st.info(
-        f"شكراً لكِ يا **{summary['name']}**{phone_text}! طلبك عبارة عن:"
-        f" **{summary['details']}** | موعد الاستلام:"
-        f" **{summary['schedule']}**{note_text}."
-    )
-    st.warning(
-        f"💳 **الدفع عبر التحويل:**\n"
-        f"المبلغ المطلوب: **{summary['total']} ريال**\n"
-        f"بيانات التحويل: **{STC_BANK_INFO}**"
-    )
-
-  if st.button("تسجيل طلب جديد ⛳️"):
-    st.session_state.customer_name = ""
-    st.session_state.customer_phone = ""
-    st.session_state.customer_notes = ""
-    st.session_state.step = 1
-    st.rerun()
+      "
