@@ -69,7 +69,7 @@ with st.sidebar:
   elif admin_pass:
     st.error("الرقم السري خاطئ.")
 
-# تكبير الخط للمستخدم في واجهة الطلب إلى 30px
+# تكبير الخط للمستخدم خصوصاً أسماء الأصناف وحقول الكميات
 st.markdown(
     """
     <style>
@@ -78,14 +78,29 @@ st.markdown(
     .stApp .main .block-container .stMarkdown,
     .stApp .main .block-container input,
     .stApp .main .block-container textarea,
-    .stApp .main .block-container button {
-        font-size: 30px !important;
+    .stApp .main .block-container button,
+    [data-testid="stNumberInput"] label,
+    [data-testid="stNumberInput"] label p,
+    [data-testid="stNumberInput"] input,
+    [data-testid="stNumberInput"] button,
+    [data-testid="stTextInput"] label,
+    [data-testid="stTextInput"] label p,
+    [data-testid="stTextArea"] label,
+    [data-testid="stTextArea"] label p,
+    [data-testid="stDateInput"] label,
+    [data-testid="stDateInput"] label p {
+        font-size: 32px !important;
+        line-height: 1.45 !important;
+    }
+    [data-testid="stNumberInput"] label,
+    [data-testid="stNumberInput"] label p {
+        font-weight: 600 !important;
     }
     .stApp .main .block-container h2 {
-        font-size: 38px !important;
+        font-size: 40px !important;
     }
     .stApp .main .block-container h3 {
-        font-size: 36px !important;
+        font-size: 38px !important;
     }
     </style>
     """,
