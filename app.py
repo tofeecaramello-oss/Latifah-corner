@@ -185,14 +185,14 @@ elif st.session_state.step == 2:
       step=1,
   )
   ice_qty = st.number_input(
-      "🍦 vanilla ice cream with mango🥭 (السعر: ١٠ ريال)",
+      "🍦 vanilla ice cream  (السعر: ١٠ ريال)",
       min_value=0,
       max_value=20,
       value=0,
       step=1,
   )
   mango_ice_qty = st.number_input(
-      "🥭 آيسكريم مانجو (السعر: ١٠ ريال)",
+      "🥭 mango ice cream (السعر: ١٠ ريال)",
       min_value=0,
       max_value=20,
       value=0,
