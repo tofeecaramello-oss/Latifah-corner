@@ -124,11 +124,11 @@ st.write("---")
 if st.session_state.step == 1:
   st.subheader("الخطوة 1 من 2: بيانات العميل ✌🏼")
   name = st.text_input(
-      "اسمك الله يرضيك 💕:", value=st.session_state.customer_name
+      "اسمك  💕:", value=st.session_state.customer_name
   )
   phone_label = (
-      "رقم الجوال (للي بيستلم من الشارع/برّا فقط، أما الاستلام من داخل مو"
-      " لازم) 📱:"
+      "رقم الجوال (للي بيستلم من برّا فقط، الاستلام من داخل مو"
+      " لازم) :"
   )
   phone = st.text_input(
       phone_label,
@@ -190,7 +190,7 @@ elif st.session_state.step == 2:
       step=1,
   )
   ice_qty = st.number_input(
-      "🍦 آيسكريم مانجو🥭 (السعر: ١٠ ريال)",
+      "🍦 vanilla ice cream with mango🥭 (السعر: ١٠ ريال)",
       min_value=0,
       max_value=20,
       value=0,
@@ -204,7 +204,7 @@ elif st.session_state.step == 2:
       step=1,
   )
   brownie_qty = st.number_input(
-      "🍫 palm tree brownie (السعر: ١١٠ ريال)",
+      "🍫  brownie للجمعات (السعر: ١١٠ ريال)",
       min_value=0,
       max_value=20,
       value=0,
@@ -237,7 +237,7 @@ elif st.session_state.step == 2:
   )
 
   st.write("---")
-  st.write("📅 **متى تبي طلبك يكون جاهز؟**")
+  st.write("📅 **متى تبي طلبك يكون جاهز تقريبا؟**")
   col_date, col_time = st.columns(2)
   with col_date:
     selected_date = st.date_input(
@@ -253,7 +253,7 @@ elif st.session_state.step == 2:
 
   st.write("---")
   notes_label = (
-      "ملاحظات إضافية (مثل: نوع/لون السيارة عند الاستلام، أو تعديل بالطلب):"
+      "ملاحظات إضافية (مثل: اضافه او تعديل بالطلب):"
   )
   notes = st.text_area(notes_label, value=st.session_state.customer_notes)
 
